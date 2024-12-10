@@ -19,7 +19,7 @@ interface DateTimePickerProps
     id: string
 }
 
-export function DateTimePicker({ className, id, ...props }: DateTimePickerProps) {
+export function DateTimePicker({ }: DateTimePickerProps) {
     const [date, setDate] = React.useState<Date>()
 
     return (
