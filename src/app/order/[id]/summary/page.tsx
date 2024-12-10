@@ -1,5 +1,5 @@
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import {
     Table,
     TableBody,
@@ -7,9 +7,13 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from '@/components/ui/table'
+} from '@/components/ui/table';
 
-export default function OrderSummary({ params }: { params: { id: string } }) {
+type Params = Promise<{ id: string }>;
+
+export default async function OrderSummary(props: { params: Params }) {
+    const params = await props.params;
+
     // Mock data
     const order = {
         id: params.id,
@@ -44,7 +48,7 @@ export default function OrderSummary({ params }: { params: { id: string } }) {
                 total: 9.16,
             },
         ],
-    }
+    };
 
     return (
         <div className="space-y-6">
@@ -98,6 +102,5 @@ export default function OrderSummary({ params }: { params: { id: string } }) {
                 ))}
             </div>
         </div>
-    )
+    );
 }
-

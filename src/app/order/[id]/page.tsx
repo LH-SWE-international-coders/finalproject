@@ -1,5 +1,6 @@
 'use client'
 
+import { use } from 'react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -14,8 +15,12 @@ import {
 import { AddEditItemModal } from '@/components/add-edit-item-modal'
 import Link from 'next/link'
 
-export default function OrderDetails({ params }: { params: { id: string } }) {
-    const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false)
+type Params = Promise<{ id: string }>;
+
+export default function OrderDetails(props: { params: Params }) {
+    const params = use(props.params);
+
+    const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
 
     // Mock data
     const order = {
