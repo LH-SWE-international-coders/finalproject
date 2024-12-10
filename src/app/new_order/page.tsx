@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import Link from "next/link"
+import { DateTimePicker } from "@/components/ui/date-time-picker"
 
 export default function AddGroupOrder() {
     return (
@@ -19,7 +20,7 @@ export default function AddGroupOrder() {
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="cutoffTime">Cut-off Time</Label>
-                    {/* <DateTimePicker id="cutoffTime" /> */}
+                    <DateTimePicker id="cutoffTime" />
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="deliveryAddress">Delivery Address</Label>
