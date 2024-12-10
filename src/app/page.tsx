@@ -38,7 +38,7 @@ export default function Home() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Group Orders</h1>
-        <Button>Create New Group Order</Button>
+        <Button>Create Order</Button>
       </div>
       <Tabs defaultValue="all">
         <TabsList>
