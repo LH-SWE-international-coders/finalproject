@@ -45,7 +45,6 @@ export default function Home() {
       <Tabs defaultValue="all" className='items-center'>
         <TabsList className='flex overflow-x-auto pl-10 phone:pl-0 phone:inline phone:overflow-visible'>
           <TabsTrigger value="all">All Orders</TabsTrigger>
-          <TabsTrigger value="my-orders">My Orders</TabsTrigger>
           <TabsTrigger value="active">Active</TabsTrigger>
           <TabsTrigger value="completed">Completed</TabsTrigger>
         </TabsList>
