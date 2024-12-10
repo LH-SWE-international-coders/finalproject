@@ -1,3 +1,4 @@
+// "use client"
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import {
@@ -34,14 +35,15 @@ const orders = [
 ]
 
 export default function Home() {
+  // const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-2">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Group Orders</h1>
-        <Button>Create New Group Order</Button>
+        <h1 className="text-3xl px-2 font-bold">Group Orders</h1>
+        <Button>Create Order</Button>
       </div>
-      <Tabs defaultValue="all">
-        <TabsList>
+      <Tabs defaultValue="all" className='items-center'>
+        <TabsList className='flex overflow-x-auto pl-10 phone:pl-0 phone:inline phone:overflow-visible'>
           <TabsTrigger value="all">All Orders</TabsTrigger>
           <TabsTrigger value="my-orders">My Orders</TabsTrigger>
           <TabsTrigger value="active">Active</TabsTrigger>
@@ -74,6 +76,10 @@ export default function Home() {
         </TabsContent>
         {/* Add content for other tabs */}
       </Tabs>
+      {/* <CreateGroupOrderModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+      /> */}
     </div>
   )
 }
