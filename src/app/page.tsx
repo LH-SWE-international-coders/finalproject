@@ -40,7 +40,9 @@ export default function Home() {
     <div className="space-y-6 px-2">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl px-2 font-bold">Group Orders</h1>
-        <Button>Create Order</Button>
+        <Button>
+          <Link href="/new_order">Create Order</Link>
+        </Button>
       </div>
       <Tabs defaultValue="all" className='items-center'>
         <TabsList className='flex overflow-x-auto pl-10 phone:pl-0 phone:inline phone:overflow-visible'>
