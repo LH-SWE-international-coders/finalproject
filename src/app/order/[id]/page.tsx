@@ -12,6 +12,7 @@ import {
     TableRow,
 } from '@/components/ui/table'
 import { AddEditItemModal } from '@/components/add-edit-item-modal'
+import Link from 'next/link'
 
 export default function OrderDetails({ params }: { params: { id: string } }) {
     const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false)
@@ -94,6 +95,9 @@ export default function OrderDetails({ params }: { params: { id: string } }) {
                     <Button variant="outline">Set Cut-Off Time</Button>
                     <Button variant="outline">Close Order</Button>
                     <Button>Submit Order</Button>
+                    <Button asChild>
+                        <Link href={`/order/${params.id}/summary`}>View Order Summary</Link>
+                    </Button>
                 </div>
             )}
             <AddEditItemModal
