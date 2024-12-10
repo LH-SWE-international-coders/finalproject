@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import {
     Table,
@@ -47,7 +48,12 @@ export default function OrderSummary({ params }: { params: { id: string } }) {
 
     return (
         <div className="space-y-6">
-            <h1 className="text-3xl font-bold">{order.title} - Order Summary</h1>
+            <div className="flex justify-between items-center">
+                <h1 className="text-3xl font-bold">{order.title} - Order Summary</h1>
+                <Button asChild>
+                    <Link href={`/order/${params.id}`}>Back to Order Details</Link>
+                </Button>
+            </div>
             <div className="bg-muted p-4 rounded-lg">
                 <h2 className="text-lg font-semibold mb-2">Order Details</h2>
                 <p>Total Items: {order.totalItems}</p>
