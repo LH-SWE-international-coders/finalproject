@@ -149,12 +149,15 @@ function aggregateParticipantStats(
 
 export default function OrderDetails(props: { params: Params }) {
   const params = use(props.params);
+  const order_id = params.id;
 
   const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
   const [isAddParticipantModalOpen, setIsAddParticipantModalOpen] =
     useState(false);
 
-  const order_id = params.id;
+  // Total delivery fee (hardcoded)
+  const totalDeliveryFee = 5;
+
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [orderRecord, setOrderRecord] = useState<OrderRecord>();
   const [aggregatedProducts, setAggregatedProducts] = useState<
@@ -247,9 +250,15 @@ export default function OrderDetails(props: { params: Params }) {
     return <div>Error: {fetchError || userError}</div>; // Show error if fetching fails
   }
 
+  // Calculate total expenditure from all participants
+  const totalExpenditure = participantStats.reduce(
+    (sum, participant) => sum + participant.total_expenditure,
+    0
+  );
+
   const handleDelete = async (productId: number) => {
     try {
-      const response = await fetch("/api/deleteOrderItem", {
+      const response = await fetch("/api/orderItems", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -267,14 +276,7 @@ export default function OrderDetails(props: { params: Params }) {
 
       const data = await response.json();
       alert("Order item deleted successfully!");
-
-      const updatedItems = orderItems.filter(
-        (item) =>
-          item.order_id !== parseInt(order_id, 10) ||
-          item.product_id !== productId ||
-          item.student_id !== user.id
-      );
-      setOrderItems(updatedItems);
+      window.location.reload();
     } catch (error) {
       console.error("Error deleting item:", error);
       alert("Failed to delete order item");
@@ -326,17 +328,31 @@ export default function OrderDetails(props: { params: Params }) {
           {orderRecord?.status}
         </Badge>
       </div>
-
       {/* Participants Section */}
       <div className="bg-muted p-4 rounded-lg">
         <h2 className="text-lg font-semibold mb-2">Participants</h2>
-        <ul className="space-y-2">
-          {participantStats.map((participant) => (
-            <li key={participant.student_id} className="flex justify-between">
-              <span>{participant.name}</span>
-              <span>${participant.total_expenditure.toFixed(2)}</span>
-            </li>
-          ))}
+        <ul>
+          {participantStats.map((participant) => {
+            // Calculate the participant's share of the delivery fee
+            const participantDeliveryFee =
+              totalExpenditure > 0
+                ? (participant.total_expenditure / totalExpenditure) *
+                  totalDeliveryFee
+                : 0;
+
+            return (
+              <li key={participant.student_id} className="flex justify-between">
+                <span>{participant.name}</span>
+                <span>
+                  ${participant.total_expenditure.toFixed(2)} + $
+                  {participantDeliveryFee.toFixed(2)} = $
+                  {(
+                    participant.total_expenditure + participantDeliveryFee
+                  ).toFixed(2)}
+                </span>
+              </li>
+            );
+          })}
         </ul>
       </div>
       {/* My Order Section */}
@@ -426,6 +442,45 @@ export default function OrderDetails(props: { params: Params }) {
                   <TableCell>{item.contributors.join(", ")}</TableCell>
                 </TableRow>
               ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+
+      {/* Delivery Fee Breakdown Table */}
+      <div className="mt-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+          <h2 className="text-xl sm:text-2xl font-semibold">
+            Delivery Fee Breakdown
+          </h2>
+        </div>
+
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Participant</TableHead>
+                <TableHead>Expenditure</TableHead>
+                <TableHead>Delivery Fee Due</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {participantStats.map((participant) => {
+                const participantDeliveryFee =
+                  totalExpenditure > 0
+                    ? (participant.total_expenditure / totalExpenditure) *
+                      totalDeliveryFee
+                    : 0;
+                return (
+                  <TableRow key={participant.student_id}>
+                    <TableCell>{participant.name}</TableCell>
+                    <TableCell>
+                      ${participant.total_expenditure.toFixed(2)}
+                    </TableCell>
+                    <TableCell>${participantDeliveryFee.toFixed(2)}</TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>
