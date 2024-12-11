@@ -12,24 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Prisma } from "@prisma/client"; // Import Prisma types
-
-// Define a type for orders with included relations
-type OrderWithRelations = Prisma.order_recordsGetPayload<{
-  include: {
-    group_orders: {
-      include: {
-        students: true;
-      };
-    };
-    order_items: {
-      include: {
-        products: true;
-      };
-    };
-  };
-}>;
-
+import { OrderRecord } from "@/lib/interfaces"; // Import types
 
 export default async function Home() {
   // Initialize Supabase client
@@ -47,30 +30,34 @@ export default async function Home() {
   }
 
   const userStudentId = user.id;
-  console.log(userStudentId)
 
   // Fetch orders directly from the database
-  const orders: OrderWithRelations[] = await db.order_records.findMany({
+  const orders = (await db.order_records.findMany({
     where: {
       group_orders: {
         some: {
-          student_id: userStudentId, // Match the logged-in user's ID
+          student_id: userStudentId,
         },
       },
     },
     include: {
+      students: true,
       group_orders: {
         include: {
-          students: true, // Include participant details
+          students: true,
         },
       },
       order_items: {
         include: {
-          products: true, // Include product details
+          products: {
+            include: {
+              product_prices: true,
+            },
+          },
         },
       },
     },
-  });
+  })) as unknown as OrderRecord[];
 
   return (
     <div className="space-y-6 px-2">
@@ -91,13 +78,13 @@ export default async function Home() {
             <Card key={order.id}>
               <CardHeader>
                 <div className="flex justify-between items-center">
-                  <CardTitle>{order.type || "Unknown Title"}</CardTitle>
+                  <CardTitle>{order.description || "Unknown Title"}</CardTitle>
                   <Badge variant={order.status === "open" ? "default" : "secondary"}>
                     {order.status}
                   </Badge>
                 </div>
                 <CardDescription>
-                  Hosted by {order.group_orders[0]?.students.name || "Unknown"}
+                  Hosted by {order.group_orders[0]?.students?.name || "Unknown"}
                 </CardDescription>
               </CardHeader>
               <CardContent>
