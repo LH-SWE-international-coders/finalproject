@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model group_orders {
+  order_id      Int
+  student_id    String
+  role          String?
+  order_records order_records @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  students      students      @relation(fields: [student_id], references: [id], onDelete: Cascade)
+
+  @@id([order_id, student_id])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model order_items {
+  order_id      Int
+  product_id    Int
+  student_id    String
+  quantity      Int?
+  order_records order_records @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  products      products      @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  students      students      @relation(fields: [student_id], references: [id], onDelete: Cascade)
+
+  @@id([order_id, product_id, student_id])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model order_records {
+  id                  Int            @id @default(autoincrement())
+  host_student_id     String?
+  type                String?        @default("individual")
+  status              String?        @default("'open'::text")
+  expected_order_date DateTime?      @db.Timestamp(6)
+  order_date          DateTime?      @db.Timestamp(6)
+  delivery_date       DateTime?      @db.Timestamp(6)
+  created_at          DateTime       @default(now()) @db.Timestamptz(6)
+  description         String?
+  group_orders        group_orders[]
+  order_items         order_items[]
+  students            students?      @relation(fields: [host_student_id], references: [id], onDelete: Cascade)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model product_prices {
+  product_id Int      @default(autoincrement())
+  cost       Float?
+  date       DateTime @db.Timestamp(6)
+  remarks    String?
+  products   products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@id([product_id, date])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model products {
+  id             Int              @id @default(autoincrement())
+  description    String?
+  order_items    order_items[]
+  product_prices product_prices[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model students {
+  id            String          @id
+  name          String
+  group_orders  group_orders[]
+  order_items   order_items[]
+  order_records order_records[]
+}
