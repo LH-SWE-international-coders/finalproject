@@ -11,7 +11,9 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import { GroupOrder } from "@/lib/interfaces"; // Import types
+import { redirect } from "next/navigation";
 
 export default async function Home() {
   // Initialize Supabase client
@@ -25,7 +27,7 @@ export default async function Home() {
 
   // Handle errors or unauthenticated state
   if (error || !user) {
-    throw new Error("User is not authenticated");
+    redirect("/login");
   }
 
   const userStudentId = user.id;
@@ -48,6 +50,9 @@ export default async function Home() {
 
     return (
       <div className="space-y-6 px-2">
+        <div className="line"></div>
+        <div className="line"></div>
+        <div className="line"></div>
         <div className="flex justify-between items-center">
           <h1 className="text-3xl px-2 font-bold">Group Orders</h1>
           <Button>

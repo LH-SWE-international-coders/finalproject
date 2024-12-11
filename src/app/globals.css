@@ -2,8 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box !important;
+}
+
+/*background*/
+html, body {
+    height: auto;
+    min-height: 100%;
+}
+
 body {
-  font-family: Arial, Helvetica, sans-serif;
+    width: 100%;
+    background: linear-gradient(135deg, #A0D9D9, #F5A3A3); /* Gradient background */
+    color: #000;
+    line-height: 1.6;
+    position: relative;
+    font-family: sans-serif;
+    overflow: auto;
+    display: block;
 }
 
 @layer base {
@@ -60,9 +79,6 @@ body {
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
-}
-
-@layer base {
   * {
     @apply border-border;
   }
