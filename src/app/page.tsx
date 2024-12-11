@@ -62,6 +62,9 @@ export default async function Home() {
 
   return (
     <div className="space-y-6 px-2">
+      <div className="line"></div>
+      <div className="line"></div>
+      <div className="line"></div>
       <div className="flex justify-between items-center">
         <h1 className="text-3xl px-2 font-bold">Group Orders</h1>
         <Button>
@@ -107,6 +110,11 @@ export default async function Home() {
           ))}
         </TabsContent>
       </Tabs>
+      {/* <CreateGroupOrderModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+      /> */}
+      
     </div>
   );
 }
