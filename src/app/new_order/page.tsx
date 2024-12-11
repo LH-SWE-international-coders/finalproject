@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useUser } from "@/lib/hooks/useUser";
 
 export default function AddGroupOrder() {

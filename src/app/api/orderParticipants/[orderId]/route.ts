@@ -5,20 +5,17 @@ export async function GET(
   req: NextRequest,
   { params }: { params: { orderId: string } }
 ) {
-  const { orderId } = params;
-  console.log("orderId from query:", orderId);
+  const { orderId } = await params;
 
   // Validate that orderId is provided and is a valid number
   if (!orderId || isNaN(Number(orderId))) {
     return NextResponse.json(
-      { error: "order_id is required." },
+      { error: "order_id is required and must be a valid number." },
       { status: 400 }
     );
   }
 
   try {
-    console.log("Fetching group_orders for orderId:", orderId);
-
     // Fetch group_orders for the given orderId, including students
     const groupOrders = await db.group_orders.findMany({
       where: {
