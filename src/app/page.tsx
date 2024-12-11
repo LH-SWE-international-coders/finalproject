@@ -12,6 +12,24 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Prisma } from "@prisma/client"; // Import Prisma types
+
+// Define a type for orders with included relations
+type OrderWithRelations = Prisma.order_recordsGetPayload<{
+  include: {
+    group_orders: {
+      include: {
+        students: true;
+      };
+    };
+    order_items: {
+      include: {
+        products: true;
+      };
+    };
+  };
+}>;
+
 
 export default async function Home() {
   // Initialize Supabase client
@@ -32,7 +50,7 @@ export default async function Home() {
   console.log(userStudentId)
 
   // Fetch orders directly from the database
-  const orders = await db.order_records.findMany({
+  const orders: OrderWithRelations[] = await db.order_records.findMany({
     where: {
       group_orders: {
         some: {
