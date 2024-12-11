@@ -318,7 +318,10 @@ export default function OrderDetails(props: { params: Params }) {
             Hosted by {orderRecord?.students?.name}
           </p>
           <p className="text-muted-foreground">
-            Expected {formatDate(orderRecord?.expected_order_date)}
+            Expected Order Date:{" "}
+            {orderRecord?.expected_order_date
+              ? formatDate(orderRecord.expected_order_date)
+              : "not specified"}
           </p>
         </div>
         <Badge
@@ -504,12 +507,12 @@ export default function OrderDetails(props: { params: Params }) {
 
       {/* Add/Edit Item Modal */}
       <AddEditItemModal
-        orderId={orderRecord?.id}
+        orderId={orderRecord?.id ?? -1}
         isOpen={isAddItemModalOpen}
         onClose={() => setIsAddItemModalOpen(false)}
       />
       <InviteParticipantModal
-        orderId={orderRecord?.id}
+        orderId={orderRecord?.id ?? -1}
         isOpen={isAddParticipantModalOpen}
         onClose={() => setIsAddParticipantModalOpen(false)}
       />

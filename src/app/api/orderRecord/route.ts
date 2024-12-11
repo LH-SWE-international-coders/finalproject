@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
   try {
     const {
       host_student_id,
-      description,
+      // description,
       type,
       status,
       expected_order_date,
@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
     const newOrder = await db.order_records.create({
       data: {
         host_student_id,
-        description: description || "",
+        // description: description || "",
         type: type || "individual", // Fallback to default value
         status: status || "open", // Fallback to default value
         expected_order_date: expected_order_date
