@@ -13,6 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { OrderRecord } from "@/lib/interfaces"; // Import types
+import { redirect } from "next/navigation";
 
 export default async function Home() {
   // Initialize Supabase client
@@ -26,7 +27,7 @@ export default async function Home() {
 
   // Handle errors or unauthenticated state
   if (error || !user) {
-    throw new Error("User is not authenticated");
+    redirect('/login');
   }
 
   const userStudentId = user.id;
