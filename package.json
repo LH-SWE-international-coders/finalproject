@@ -10,7 +10,7 @@
             "test": "jest",
               "test-watch": "jest --watch",
                 "generate": "npx prisma generate",
-                  "postinstall": "prisma generate",
+                  "postinstall": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^6.0.1",
