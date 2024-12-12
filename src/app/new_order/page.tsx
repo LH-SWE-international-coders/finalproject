@@ -65,10 +65,15 @@ export default function AddGroupOrder() {
       alert("Order and group order created successfully!");
       console.log("Order created:", data);
       window.location.href = "/"; // Navigate to the home page
-    } catch (error: any) {
-      console.error("Error:", error);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'An unknown error occurred during creating the order';
+
+      console.error('Error during signup:', errorMessage);
       setFetchError(
-        error.message || "An error occurred while creating the order"
+        errorMessage || "An error occurred while creating the order"
       );
     }
   };

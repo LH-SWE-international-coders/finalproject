@@ -50,9 +50,13 @@ export function InviteParticipantModal({
       alert("Participant added successfully!");
       window.location.reload(); // Refreshes the page
       onClose(); // Close modal after success
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'An unknown error occurred during creating the order';
       setError(
-        error.message || "An error occurred while adding the participant."
+        errorMessage || "An error occurred while adding the participant."
       );
       console.error("Error:", error);
     } finally {

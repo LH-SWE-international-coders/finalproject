@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 export const useUser = () => {
-  const [user, setUser] = useState<any>(null); // You can type this with your user object
+  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -16,8 +16,12 @@ export const useUser = () => {
 
         const data = await response.json();
         setUser(data.user); // Assuming the API response is { user: { id, email } }
-      } catch (err: any) {
-        setError(err.message);
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : 'An unknown error occurred during creating the order';
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }

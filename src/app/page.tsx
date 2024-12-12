@@ -147,7 +147,11 @@ export default async function Home() {
         </Tabs>
       </div>
     );
-  } catch (e) {
-    return <div>Error: {e.message}</div>;
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : 'An unknown error occurred during creating the order';
+    return <div>Error: {errorMessage}</div>;
   }
 }

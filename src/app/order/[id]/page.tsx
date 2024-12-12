@@ -209,8 +209,12 @@ export default function OrderDetails(props: { params: Params }) {
           user.id
         );
         setOrderItems(filteredOrderItems);
-      } catch (error: any) {
-        setFetchError(error.message);
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : 'An unknown error occurred during creating the order';
+        setFetchError(errorMessage);
       } finally {
         setLoadingItems(false);
       }
@@ -228,8 +232,12 @@ export default function OrderDetails(props: { params: Params }) {
 
         const data = await response.json();
         setOrderRecord(data);
-      } catch (error: any) {
-        setFetchError(error.message);
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : 'An unknown error occurred during creating the order';
+        setFetchError(errorMessage);
       } finally {
         setLoadingRecord(false);
       }
@@ -340,7 +348,7 @@ export default function OrderDetails(props: { params: Params }) {
             const participantDeliveryFee =
               totalExpenditure > 0
                 ? (participant.total_expenditure / totalExpenditure) *
-                  totalDeliveryFee
+                totalDeliveryFee
                 : 0;
 
             return (
@@ -472,7 +480,7 @@ export default function OrderDetails(props: { params: Params }) {
                 const participantDeliveryFee =
                   totalExpenditure > 0
                     ? (participant.total_expenditure / totalExpenditure) *
-                      totalDeliveryFee
+                    totalDeliveryFee
                     : 0;
                 return (
                   <TableRow key={participant.student_id}>
