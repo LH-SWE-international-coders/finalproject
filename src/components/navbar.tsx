@@ -1,12 +1,6 @@
 import Link from "next/link";
-import { Bell, Home, ShoppingCart, User } from "lucide-react";
+import { Home, ShoppingCart, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 export function Navbar() {
   return (
