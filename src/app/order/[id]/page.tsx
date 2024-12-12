@@ -13,139 +13,25 @@ import {
 } from "@/components/ui/table";
 import { AddEditItemModal } from "@/components/add-edit-item-modal";
 import { InviteParticipantModal } from "../../../components/invite-participants-modal";
-import { OrderItem, GroupOrder, OrderRecord } from "../../../lib/interfaces";
+import {
+  OrderItem,
+  OrderRecord,
+  ParticipantStats,
+  AggregatedProduct,
+} from "../../../lib/interfaces";
+import { formatDate } from "@/utils/helpers/functions";
+import {
+  fetchOrderItems,
+  fetchOrderRecord,
+  handleDelete,
+  closeOrder,
+} from "@/utils/helpers/asyncFunctions";
 import { useUser } from "@/lib/hooks/useUser";
 
 type Params = Promise<{ id: string }>;
 
-interface AggregatedProduct {
-  product_id: number;
-  description: string;
-  total_quantity: number;
-  total_price: number;
-  contributors: string[]; // List of student names or IDs
-}
-
-interface ParticipantStats {
-  student_id: string;
-  name: string;
-  total_expenditure: number;
-}
-
-function filterOrderItemsByStudentId(
-  orderItems: OrderItem[],
-  studentId: string
-): OrderItem[] {
-  return orderItems.filter((item) => item.student_id === studentId);
-}
-
-function aggregateProductQuantities(
-  orderItems: OrderItem[]
-): AggregatedProduct[] {
-  const productMap: Map<
-    number,
-    {
-      description: string;
-      total_quantity: number;
-      total_price: number;
-      contributors: Set<string>; // A Set to avoid duplicate contributors
-    }
-  > = new Map();
-
-  orderItems.forEach((item) => {
-    const { product_id, products, quantity, students } = item;
-    const { description } = products;
-    const cost = products.product_prices[0]?.cost || 0;
-
-    // If product already exists in the map, accumulate values
-    if (productMap.has(product_id)) {
-      const product = productMap.get(product_id)!;
-      product.total_quantity += quantity;
-      product.total_price += cost * quantity;
-      product.contributors.add(students.name); // Add contributor (student name) to the set
-    } else {
-      // If product doesn't exist, create a new entry
-      productMap.set(product_id, {
-        description,
-        total_quantity: quantity,
-        total_price: cost * quantity,
-        contributors: new Set([students.name]), // Add first contributor
-      });
-    }
-  });
-
-  // Convert map to an array of AggregatedProduct objects
-  const result: AggregatedProduct[] = [];
-  productMap.forEach((value, key) => {
-    result.push({
-      product_id: key,
-      description: value.description,
-      total_quantity: value.total_quantity,
-      total_price: value.total_price,
-      contributors: Array.from(value.contributors), // Convert Set to Array
-    });
-  });
-
-  return result;
-}
-
-const formatDate = (date: string | Date | undefined) => {
-  if (!date) return ""; // Handle if the date is undefined or null
-  const parsedDate = new Date(date);
-  return parsedDate.toLocaleDateString("en-GB"); // 'en-GB' formats date as DD/MM/YYYY
-};
-
-function aggregateParticipantStats(
-  groupOrders: GroupOrder[],
-  orderItems: OrderItem[]
-): ParticipantStats[] {
-  const statsMap: Map<string, ParticipantStats> = new Map();
-
-  groupOrders.forEach((record) => {
-    const studentId = record.student_id;
-    statsMap.set(studentId, {
-      student_id: studentId,
-      name: record.students.name,
-      total_expenditure: 0,
-    });
-  });
-
-  orderItems.forEach((item) => {
-    const { student_id, quantity } = item;
-    const productPrice = item.products.product_prices[0]; // Assuming the latest price is the first entry
-
-    if (productPrice) {
-      const price = productPrice.cost;
-      const expenditure = price * quantity;
-
-      // If the student already exists in the map, update their stats
-      if (statsMap.has(student_id)) {
-        const existingStats = statsMap.get(student_id)!;
-        existingStats.total_expenditure += expenditure;
-      } else {
-        // If the student is not yet in the map, create a new entry
-        const studentName = item.students.name;
-        statsMap.set(student_id, {
-          student_id,
-          name: studentName,
-          total_expenditure: expenditure,
-        });
-      }
-    }
-  });
-
-  const result: ParticipantStats[] = [];
-  statsMap.forEach((value, key) => {
-    result.push({
-      student_id: key,
-      name: value.name,
-      total_expenditure: value.total_expenditure,
-    });
-  });
-
-  // Convert the map to an array and return it
-  return result;
-}
+// Total delivery fee (hardcoded)
+const totalDeliveryFee = 5;
 
 export default function OrderDetails(props: { params: Params }) {
   const params = use(props.params);
@@ -154,10 +40,6 @@ export default function OrderDetails(props: { params: Params }) {
   const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
   const [isAddParticipantModalOpen, setIsAddParticipantModalOpen] =
     useState(false);
-
-  // Total delivery fee (hardcoded)
-  const totalDeliveryFee = 5;
-
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [orderRecord, setOrderRecord] = useState<OrderRecord>();
   const [aggregatedProducts, setAggregatedProducts] = useState<
@@ -168,94 +50,37 @@ export default function OrderDetails(props: { params: Params }) {
   );
   const [loadingItems, setLoadingItems] = useState<boolean>(true);
   const [loadingRecord, setLoadingRecord] = useState<boolean>(true);
-
   const [fetchError, setFetchError] = useState<string | null>(null);
-  const { user, loading: userLoading, error: userError } = useUser(); // Using the useUser hook
+
+  const { user, loading: userLoading, error: userError } = useUser();
 
   useEffect(() => {
     // If user is not loaded or order_id is missing, do not proceed
     if (userLoading || !user || !order_id) {
-      return; // Early exit until user is available and order_id is valid
+      return;
     }
 
-    // Fetch Order Items
-    const fetchOrderItems = async () => {
-      try {
-        setLoadingItems(true);
-
-        const response = await fetch(`/api/orderItems/${order_id}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch order items");
-        }
-
-        const data_order_items = await response.json();
-        const aggregatedResult = aggregateProductQuantities(data_order_items);
-        setAggregatedProducts(aggregatedResult);
-
-        const groupResponse = await fetch(`/api/orderParticipants/${order_id}`);
-        if (!groupResponse.ok) {
-          throw new Error("Failed to fetch group order participants");
-        }
-
-        const data_participants = await groupResponse.json();
-        const participantStats = aggregateParticipantStats(
-          data_participants,
-          data_order_items
-        );
-        setParticipantStats(participantStats);
-
-        const filteredOrderItems = filterOrderItemsByStudentId(
-          data_order_items,
-          user.id
-        );
-        setOrderItems(filteredOrderItems);
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : "An unknown error occurred during creating the order";
-        setFetchError(errorMessage);
-      } finally {
-        setLoadingItems(false);
-      }
-    };
-
-    // Fetch Order Record
-    const fetchOrderRecord = async () => {
-      try {
-        setLoadingRecord(true);
-
-        const response = await fetch(`/api/orderRecord/${order_id}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch order record");
-        }
-
-        const data = await response.json();
-        setOrderRecord(data);
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : "An unknown error occurred during creating the order";
-        setFetchError(errorMessage);
-      } finally {
-        setLoadingRecord(false);
-      }
-    };
-
     // Start fetching once the user is loaded and order_id is valid
-    fetchOrderItems();
-    fetchOrderRecord();
-  }, [user, userLoading, order_id]); // Re-run when user, userLoading, or order_id changes
+    fetchOrderItems(
+      order_id,
+      user.id,
+      setLoadingItems,
+      setAggregatedProducts,
+      setParticipantStats,
+      setOrderItems,
+      setFetchError
+    );
+    fetchOrderRecord(order_id, setLoadingRecord, setOrderRecord, setFetchError);
+  }, [user, userLoading, order_id]);
 
   // Handle loading states
   if (userLoading || loadingItems || loadingRecord) {
-    return <div>Loading...</div>; // Show loading state until user and data are ready
+    return <div>Loading...</div>;
   }
 
   // Handle errors (if any)
   if (fetchError || userError) {
-    return <div>Error: {fetchError || userError}</div>; // Show error if fetching fails
+    return <div>Error: {fetchError || userError}</div>;
   }
 
   // Calculate total expenditure from all participants
@@ -263,56 +88,6 @@ export default function OrderDetails(props: { params: Params }) {
     (sum, participant) => sum + participant.total_expenditure,
     0
   );
-
-  const handleDelete = async (productId: number) => {
-    try {
-      const response = await fetch("/api/orderItems", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          order_id: parseInt(order_id, 10),
-          product_id: productId,
-          student_id: user?.id,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete order item");
-      }
-
-      await response.json();
-      alert("Order item deleted successfully!");
-      window.location.reload();
-    } catch (error) {
-      console.error("Error deleting item:", error);
-      alert("Failed to delete order item");
-    }
-  };
-
-  const closeOrder = async (orderId: number) => {
-    try {
-      const response = await fetch("/api/orderRecord", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ order_id: orderId }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to close the order");
-      }
-
-      await response.json();
-      alert("Order closed successfully");
-      window.location.reload();
-    } catch (error) {
-      console.error("Error:", error);
-      alert("An error occurred while closing the order");
-    }
-  };
 
   return (
     <div className="space-y-6 px-4 sm:px-6 lg:px-8 xl:px-12 max-w-full lg:max-w-none">
@@ -411,7 +186,13 @@ export default function OrderDetails(props: { params: Params }) {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleDelete(item.product_id)}
+                        onClick={() =>
+                          handleDelete(
+                            item.product_id,
+                            order_id,
+                            user?.id ?? ""
+                          )
+                        }
                       >
                         Delete
                       </Button>
