@@ -53,7 +53,7 @@ function aggregateProductQuantities(
   > = new Map();
 
   orderItems.forEach((item) => {
-    const { product_id, products, quantity, student_id, students } = item;
+    const { product_id, products, quantity, students } = item;
     const { description } = products;
     const cost = products.product_prices[0]?.cost || 0;
 
@@ -111,7 +111,7 @@ function aggregateParticipantStats(
   });
 
   orderItems.forEach((item) => {
-    const { student_id, quantity, product_id } = item;
+    const { student_id, quantity } = item;
     const productPrice = item.products.product_prices[0]; // Assuming the latest price is the first entry
 
     if (productPrice) {
@@ -274,7 +274,7 @@ export default function OrderDetails(props: { params: Params }) {
         throw new Error("Failed to delete order item");
       }
 
-      const data = await response.json();
+      await response.json();
       alert("Order item deleted successfully!");
       window.location.reload();
     } catch (error) {
@@ -297,7 +297,7 @@ export default function OrderDetails(props: { params: Params }) {
         throw new Error("Failed to close the order");
       }
 
-      const data = await response.json();
+      await response.json();
       alert("Order closed successfully");
       window.location.reload();
     } catch (error) {

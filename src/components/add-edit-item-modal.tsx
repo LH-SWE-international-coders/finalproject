@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Product, ProductPrice } from "@/lib/interfaces";
+import { ProductPrice } from "@/lib/interfaces";
 import { useUser } from "@/lib/hooks/useUser";
 
 interface AddEditItemModalProps {
@@ -97,9 +97,9 @@ export function AddEditItemModal({
         throw new Error("Failed to save OrderItem");
       }
 
-      const data = await response.json();
+      await response.json();
       alert("Order Item saved successfully!");
-    } catch (error: any) {
+    } catch (error: unknown) {
       setFetchError(error.message);
       console.error("Error:", error);
     } finally {
