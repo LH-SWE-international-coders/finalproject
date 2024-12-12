@@ -95,7 +95,7 @@ export default function OrderDetails(props: { params: Params }) {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">
-            {orderRecord?.description}
+            {orderRecord?.description || "Group Order"}
           </h1>
           <p className="text-muted-foreground">
             Hosted by {orderRecord?.students?.name}
