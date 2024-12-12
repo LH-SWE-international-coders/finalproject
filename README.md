@@ -84,8 +84,6 @@ The group order details page provides in-depth information about a specific grou
 
 # Developers Guide
 
-# Developer's Guide
-
 This guide provides a step-by-step process to set up and run the project locally. It also includes the details for CI/CD configuration and environment variables.
 
 ---
