@@ -1,114 +1,179 @@
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter,
-} from '@/components/ui/dialog'
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select'
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ProductPrice } from "@/lib/interfaces";
+import { useUser } from "@/lib/hooks/useUser";
 
 interface AddEditItemModalProps {
-    isOpen: boolean
-    onClose: () => void
-    participants: string[]
-    item?: {
-        name: string
-        quantity: number
-        price: number
-        contributors: string[]
-    }
+  orderId: number;
+  isOpen: boolean;
+  onClose: () => void;
+  item?: {
+    name: string;
+    quantity: number;
+    price: number;
+    contributors: string[];
+  };
 }
 
-export function AddEditItemModal({ isOpen, onClose, participants, item }: AddEditItemModalProps) {
-    const [name, setName] = useState(item?.name || '')
-    const [quantity, setQuantity] = useState(item?.quantity.toString() || '1')
-    const [price, setPrice] = useState(item?.price.toString() || '')
-    const [contributors, setContributors] = useState<string[]>(item?.contributors || [])
+export function AddEditItemModal({
+  orderId,
+  isOpen,
+  onClose,
+  item,
+}: AddEditItemModalProps) {
+  const [quantity, setQuantity] = useState(item?.quantity.toString() || "1");
+  const [chosenProduct, setChosenProduct] = useState<ProductPrice>();
+  const [productPrices, setProductPrices] = useState<ProductPrice[]>([]);
+  const [fetchLoading, setFetchLoading] = useState<boolean>(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-        // Handle form submission
-        onClose()
+  const { user, loading, error } = useUser();
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch(`/api/productPrices`);
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch product prices: ${response.statusText}`
+          );
+        }
+
+        const data: ProductPrice[] = await response.json();
+        setProductPrices(data);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.error("Error fetching product prices:", err.message);
+          setFetchError(err.message);
+        } else {
+          setFetchError("An unexpected error occurred.");
+        }
+      } finally {
+        setFetchLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchOrders();
     }
+  }, [user]);
 
-    return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>{item ? 'Edit Item' : 'Add New Item'}</DialogTitle>
-                </DialogHeader>
-                <form onSubmit={handleSubmit}>
-                    <div className="space-y-4">
-                        <div>
-                            <Label htmlFor="name">Item Name</Label>
-                            <Input
-                                id="name"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                required
-                            />
-                        </div>
-                        <div>
-                            <Label htmlFor="quantity">Quantity</Label>
-                            <Input
-                                id="quantity"
-                                type="number"
-                                min="1"
-                                value={quantity}
-                                onChange={(e) => setQuantity(e.target.value)}
-                                required
-                            />
-                        </div>
-                        <div>
-                            <Label htmlFor="price">Price</Label>
-                            <Input
-                                id="price"
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                value={price}
-                                onChange={(e) => setPrice(e.target.value)}
-                                required
-                            />
-                        </div>
-                        <div>
-                            <Label htmlFor="contributors">Contributors</Label>
-                            <Select
-                                onValueChange={(value) => setContributors(value ? [value] : [])}
-                                value={contributors[0]}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select contributor" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {participants.map((participant) => (
-                                        <SelectItem key={participant} value={participant}>
-                                            {participant}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
-                    <DialogFooter className="mt-6">
-                        <Button type="button" variant="outline" onClick={onClose}>
-                            Cancel
-                        </Button>
-                        <Button type="submit">Save</Button>
-                    </DialogFooter>
-                </form>
-            </DialogContent>
-        </Dialog>
-    )
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setFetchLoading(true);
+    setFetchError(null); // Reset error state
+
+    try {
+      const response = await fetch(
+        `/api/orderItems/${orderId}/${chosenProduct?.product_id}/${user?.id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            quantity: parseInt(quantity, 10), // send the quantity to be added or updated
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to save OrderItem");
+      }
+
+      await response.json();
+      alert("Order Item saved successfully!");
+    } catch (error) {
+      setFetchError((error as Error).message);
+      console.error("Error:", error);
+    } finally {
+      setFetchLoading(false); // Stop loading after the request
+      window.location.reload(); // Refreshes the page
+      onClose();
+    }
+  };
+
+  if (loading || fetchLoading) return <div>Loading...</div>;
+  if (error || fetchError) return <div>Error: {fetchError}</div>;
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{item ? "Edit Item" : "Add New Item"}</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit}>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="name">Item Name</Label>
+              <Select
+                onValueChange={(value) => setChosenProduct(JSON.parse(value))} // Set the chosen product when a value is selected
+                value={chosenProduct ? JSON.stringify(chosenProduct) : ""} // Set the selected value to reflect chosenProduct
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select item" />
+                </SelectTrigger>
+                <SelectContent>
+                  {productPrices.map((productPrice) => (
+                    <SelectItem
+                      key={productPrice.product_id}
+                      value={JSON.stringify(productPrice)} // Convert the object to a string to use it as a value
+                    >
+                      {productPrice.products.description}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="price">Price</Label>
+              <Input
+                id="price"
+                type="number"
+                step="0.01"
+                min="0"
+                value={chosenProduct?.cost || ""}
+                disabled
+              />
+            </div>
+            <div>
+              <Label htmlFor="quantity">Quantity</Label>
+              <Input
+                id="quantity"
+                type="number"
+                min="1"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+          <DialogFooter className="mt-6">
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit" onClick={handleSubmit}>
+              Save
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
 }
-
