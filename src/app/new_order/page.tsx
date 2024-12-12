@@ -50,7 +50,7 @@ export default function AddGroupOrder() {
         },
         body: JSON.stringify({
           host_student_id: user.id,
-          //   description: orderDesc,
+          description: orderDesc,
           type: "group", // Default type
           status: "open", // Default status
           expected_order_date: parseDate(expectedOrderDate),
@@ -69,9 +69,9 @@ export default function AddGroupOrder() {
       const errorMessage =
         error instanceof Error
           ? error.message
-          : 'An unknown error occurred during creating the order';
+          : "An unknown error occurred during creating the order";
 
-      console.error('Error during signup:', errorMessage);
+      console.error("Error during signup:", errorMessage);
       setFetchError(
         errorMessage || "An error occurred while creating the order"
       );

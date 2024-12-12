@@ -24,7 +24,7 @@ const OrderCard = ({ order }: OrderCardProps) => (
     <CardHeader>
       <div className="flex justify-between items-center">
         <CardTitle>
-          {order.order_records.description || "Unknown Title"}
+          {order.order_records.description || "Group Order"}
         </CardTitle>
         <Badge
           variant={
@@ -151,7 +151,7 @@ export default async function Home() {
     const errorMessage =
       error instanceof Error
         ? error.message
-        : 'An unknown error occurred during creating the order';
+        : "An unknown error occurred during creating the order";
     return <div>Error: {errorMessage}</div>;
   }
 }
