@@ -67,10 +67,30 @@ The group order details page provides in-depth information about a specific grou
 - **Features:**
   - **Add Items:** Users can add items to the group order, including the item name, quantity, and associated participants.
   - **Delete Items:**: Users can delete items that they created in the group order.
-  - **Add Participants:** Users can invite others to the group order by providing their student IDs.
+  - **Add Participants:** Users can invite others to the group order by student ID, which can be found in the profile page.
   - **Overview:** Displays all items added to the group order along with participant contributions and price summary at the top.
 
 ---
+### **6. Profile Page**  
+**URL:** [https://lh-swe-project.vercel.app/profile](https://lh-swe-project.vercel.app/profile)  
+
+The profile page allows users to view their email and user ID. The user ID is essential for adding participants to group orders.
+
+- **Features:**
+  - **User Email Display:** Shows the logged-in user's email address.
+  - **User ID Display:** Displays the logged-in user's unique ID, which can be shared with others to be added to group orders.
+  - **Logout:** Provides a button to log out from the application.
+
+**Example View:**
+- Email: user@example.com  
+- User ID: 123e4567-e89b-12d3-a456-426614174000  
+
+**How to Use:**
+1. Navigate to the **Profile Page** after logging in.
+2. Share your **User ID** with others to let them add you to their group orders.
+3. Use the **Logout** button to securely sign out of the application
+   
+--- 
 
 ## How to Navigate the Website
 
