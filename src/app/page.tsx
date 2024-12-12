@@ -115,7 +115,9 @@ export default async function Home() {
           {/* All Orders Tab */}
           <TabsContent value="all" className="space-y-4">
             {ordersExist ? (
-              data.map((order: GroupOrder) => <OrderCard order={order} />)
+              data.map((order: GroupOrder) => (
+                <OrderCard order={order} key={order.order_id} />
+              ))
             ) : (
               <div>No orders found.</div>
             )}
@@ -125,7 +127,7 @@ export default async function Home() {
           <TabsContent value="open" className="space-y-4">
             {ordersExist ? (
               filterOrdersByStatus("open").map((order: GroupOrder) => (
-                <OrderCard order={order} />
+                <OrderCard order={order} key={order.order_id} />
               ))
             ) : (
               <div>No open orders found.</div>
@@ -136,7 +138,7 @@ export default async function Home() {
           <TabsContent value="closed" className="space-y-4">
             {ordersExist ? (
               filterOrdersByStatus("closed").map((order: GroupOrder) => (
-                <OrderCard order={order} />
+                <OrderCard order={order} key={order.order_id} />
               ))
             ) : (
               <div>No closed orders found.</div>

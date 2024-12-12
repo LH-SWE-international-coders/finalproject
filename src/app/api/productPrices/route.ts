@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     // Query distinct product prices, sorted by descending timestamp
     const productPrices = await db.product_prices.findMany({

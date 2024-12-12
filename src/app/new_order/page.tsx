@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
@@ -13,7 +12,7 @@ export default function AddGroupOrder() {
   const [expectedOrderDate, setExpectedOrderDate] = useState<string>(""); // Store date as string
   const [fetchError, setFetchError] = useState<string | null>(null); // Error state to track issues
 
-  const { user, loading, error } = useUser();
+  const { user } = useUser();
 
   // Parse the expected order date from DD/MM/YYYY to a Date object
   const parseDate = (dateStr: string): string | null => {
