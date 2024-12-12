@@ -213,7 +213,7 @@ export default function OrderDetails(props: { params: Params }) {
         const errorMessage =
           error instanceof Error
             ? error.message
-            : 'An unknown error occurred during creating the order';
+            : "An unknown error occurred during creating the order";
         setFetchError(errorMessage);
       } finally {
         setLoadingItems(false);
@@ -236,7 +236,7 @@ export default function OrderDetails(props: { params: Params }) {
         const errorMessage =
           error instanceof Error
             ? error.message
-            : 'An unknown error occurred during creating the order';
+            : "An unknown error occurred during creating the order";
         setFetchError(errorMessage);
       } finally {
         setLoadingRecord(false);
@@ -274,7 +274,7 @@ export default function OrderDetails(props: { params: Params }) {
         body: JSON.stringify({
           order_id: parseInt(order_id, 10),
           product_id: productId,
-          student_id: user.id,
+          student_id: user?.id,
         }),
       });
 
@@ -348,7 +348,7 @@ export default function OrderDetails(props: { params: Params }) {
             const participantDeliveryFee =
               totalExpenditure > 0
                 ? (participant.total_expenditure / totalExpenditure) *
-                totalDeliveryFee
+                  totalDeliveryFee
                 : 0;
 
             return (
@@ -480,7 +480,7 @@ export default function OrderDetails(props: { params: Params }) {
                 const participantDeliveryFee =
                   totalExpenditure > 0
                     ? (participant.total_expenditure / totalExpenditure) *
-                    totalDeliveryFee
+                      totalDeliveryFee
                     : 0;
                 return (
                   <TableRow key={participant.student_id}>
@@ -498,7 +498,7 @@ export default function OrderDetails(props: { params: Params }) {
       </div>
 
       {/* Host Actions */}
-      {orderRecord?.host_student_id === user.id &&
+      {orderRecord?.host_student_id === user?.id &&
         orderRecord?.status === "open" && (
           <div className="flex flex-wrap gap-2 justify-end">
             <Button

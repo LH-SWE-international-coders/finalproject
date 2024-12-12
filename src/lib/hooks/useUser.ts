@@ -1,7 +1,12 @@
 import { useState, useEffect } from "react";
 
+interface User {
+  id: string;
+  email: string;
+}
+
 export const useUser = () => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User>();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,7 +25,7 @@ export const useUser = () => {
         const errorMessage =
           error instanceof Error
             ? error.message
-            : 'An unknown error occurred during creating the order';
+            : "An unknown error occurred during creating the order";
         setError(errorMessage);
       } finally {
         setLoading(false);

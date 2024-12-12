@@ -12,9 +12,11 @@ export async function POST(
   req: NextRequest,
   {
     params,
-  }: { params: { orderId: string; productId: string; studentId: string } }
+  }: {
+    params: Promise<{ orderId: string; productId: string; studentId: string }>;
+  }
 ) {
-  const { orderId, productId, studentId } = params;
+  const { orderId, productId, studentId } = await params;
   const { quantity } = await req.json(); // Get the quantity from the request body
 
   try {

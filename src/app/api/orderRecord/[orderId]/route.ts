@@ -3,9 +3,9 @@ import { db } from "@/lib/db"; // Prisma client import
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { orderId: string } }
+  { params }: { params: Promise<{ orderId: string }> }
 ) {
-  const { orderId } = params;
+  const { orderId } = await params;
 
   // Validate that orderId is provided and is a valid number
   if (!orderId || isNaN(Number(orderId))) {

@@ -81,7 +81,7 @@ export function AddEditItemModal({
 
     try {
       const response = await fetch(
-        `/api/orderItems/${orderId}/${chosenProduct?.product_id}/${user.id}`,
+        `/api/orderItems/${orderId}/${chosenProduct?.product_id}/${user?.id}`,
         {
           method: "POST",
           headers: {
@@ -99,8 +99,8 @@ export function AddEditItemModal({
 
       await response.json();
       alert("Order Item saved successfully!");
-    } catch (error: unknown) {
-      setFetchError(error.message);
+    } catch (error) {
+      setFetchError((error as Error).message);
       console.error("Error:", error);
     } finally {
       setFetchLoading(false); // Stop loading after the request

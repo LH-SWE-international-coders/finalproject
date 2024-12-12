@@ -10,9 +10,9 @@ import { db } from "@/lib/db"; // Import your Prisma client
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { orderId: string } }
+  { params }: { params: Promise<{ orderId: string }> }
 ) {
-  const { orderId } = params;
+  const { orderId } = await params;
 
   try {
     // Check if orderId is valid

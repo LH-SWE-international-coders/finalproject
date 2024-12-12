@@ -3,9 +3,9 @@ import { db } from "@/lib/db"; // Prisma client import
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { studentId: string } }
+  { params }: { params: Promise<{ studentId: string }> }
 ) {
-  const { studentId } = params;
+  const { studentId } = await params;
 
   // Validate that studentId is provided
   if (!studentId || typeof studentId !== "string") {
