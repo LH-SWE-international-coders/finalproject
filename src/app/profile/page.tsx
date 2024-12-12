@@ -22,6 +22,7 @@ export default async function ProfilePage() {
     return (
         <div className="space-y-4">
             <p>Hello {data.user.email}</p>
+            <p>Your User ID: <strong>{data.user.id}</strong></p>
             <form action={signOut}>
                 <button
                     type="submit"

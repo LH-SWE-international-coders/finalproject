@@ -29,7 +29,7 @@ export function Footer() {
                         Team Members
                     </Link>
                     <Link
-                        href="/https://program-and-modules-handbook.bham.ac.uk/webhandbooks/WebHandbooks-control-servlet?Action=getModuleDetailsList&pgSubj=06&pgCrse=40098&searchTerm=002025"
+                        href="/https://program-and-modules-handbook.bham.ac.uk/webhandbooks/WebHandbooks-control-servlet?Action=getModuleDetailsList&pgSubj=06&pgCrse=34257&searchTerm=002024"
                         className="font-medium underline underline-offset-4 hover:text-primary"
                     >
                         Course Page
